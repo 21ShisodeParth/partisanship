@@ -95,3 +95,5 @@ with open('output6_11.tsv', 'wt') as out_file:
         tsv_writer.writerow(list_to_tsv[i])
 
 print('finished')
+
+#metadata: number followers, account created
