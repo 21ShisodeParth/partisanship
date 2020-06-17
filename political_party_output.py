@@ -7,10 +7,10 @@ with open('output6_11.tsv', 'wt') as out_file:
 
 list_to_tsv = []
 
-access_token = "1147242589763985408-NRlVMq7EhFJD8dP2Y2RTwBtdkPtueu"
-access_token_secret = "aOrlhXbs8o8MNHwxCtml7jyHwpW3UyTMzL7pQ5Zqd92oB"
-consumer_key = "RCTWX5r0BO0zyjQ50OS268ncR"
-consumer_secret = "WI0HvC6l48acFfwHzs2cdNPIDOX7GGd7mpqGJp6gj91leqaz2a"
+access_token = "..."
+access_token_secret = "..."
+consumer_key = "..."
+consumer_secret = "..."
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
