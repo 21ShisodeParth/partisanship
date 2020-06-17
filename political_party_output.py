@@ -96,4 +96,4 @@ with open('output6_11.tsv', 'wt') as out_file:
 
 print('finished')
 
-#metadata: number followers, account created
+#metadata: number followers, account created, tweet id
