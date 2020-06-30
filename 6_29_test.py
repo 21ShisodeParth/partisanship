@@ -35,6 +35,7 @@ def get_info(tweet):
     addition_list.append(text)
     addition_list.append(tokenized_text)
 
+    list_to_tsv.append(addition_list)
 
 def parse_args():
     parser = argparse.ArgumentParser()
