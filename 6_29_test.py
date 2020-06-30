@@ -68,7 +68,7 @@ def main():
     args = parse_args()
     tweets = read_jsonl(args.input)
     for tweet in tweets:
-        get_id(tweet)
+        get_info(tweet)
     write_tsv(args.output, list_to_tsv)
 
 
