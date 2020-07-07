@@ -23,17 +23,17 @@ def get_nlp_info(tweet):
         index = 0
 
         if 'sentences' in tweet:
-            for s in tweet['sentences']:
+            for s in result['sentences']:
                 for t in s['tokens']:
                     index += 1 #index starts with 1, not 0
                     if t['ner'] != 'O':
                         entities.append([t['ner'], index])
 
-            for s in tweet['sentences']:
+            for s in result['sentences']:
                 for t in s['tokens']:
                     pos.append(t['pos'])
 
-            for s in tweet['sentences']:
+            for s in result['sentences']:
                 s_exp.append(s['sentimentTree'])
 
         return entities, pos, s_exp
