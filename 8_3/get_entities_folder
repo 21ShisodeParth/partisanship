@@ -1,0 +1,66 @@
+import os
+import csv
+import io
+
+list_to_csv = []
+
+dem_path = 'C:\\Users\\parth\\PycharmProjects\\bipartisanship\\dem_files\\'
+dem_files = os.listdir(dem_path)
+
+rep_path = 'C:\\Users\\parth\\PycharmProjects\\bipartisanship\\rep_files\\'
+rep_files = os.listdir(rep_path)
+
+dem_count_by_id = {}
+rep_count_by_id = {}
+
+file_end_num = ''
+
+for filename in dem_files:
+  with open(dem_path + filename, 'r') as dem_file:
+    followers = dem_file.read().split(',')
+    for follower in followers:
+      dem_count_by_id[follower] = dem_count_by_id[follower] + 1 if follower in dem_count_by_id else 1
+
+for filename in rep_files:
+  with open(rep_path + filename, 'r') as rep_file:
+    followers = rep_file.read().split(',')
+    for follower in followers:
+      rep_count_by_id[follower] = rep_count_by_id[follower] + 1 if follower in rep_count_by_id else 1
+
+
+def get_party(id):
+    dem_count = 0
+    rep_count = 0
+
+    if id in dem_count_by_id:
+        dem_count = dem_count_by_id.get(id)
+
+    if id in dem_count_by_id:
+        rep_count = rep_count_by_id.get(id)
+
+    party = ''
+
+    if dem_count > rep_count:
+        party = "democrat"
+    elif rep_count > dem_count:
+        party = "republican"
+    else:
+        party = "neutral"
+
+    return party
+
+path = "E:\\bipartisanship"
+filenames = os.listdir(path)[21:]
+
+d_dict = {}
+r_dict = {}
+for n in filenames:
+    with io.open (path + "\\" + n, 'r', encoding='utf-8') as csv_file:
+        r = csv.reader(csv_file, delimiter=',')
+        for row in r:
+            entity = row[0]
+            id = row[4]
+            if get_party(id) == 'democrat':
+                d_dict[entity] = []
+
+
