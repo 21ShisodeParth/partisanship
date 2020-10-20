@@ -1,0 +1,139 @@
+import csv
+import argparse
+import json
+import io
+import os
+from pycorenlp import StanfordCoreNLP
+
+nlp = StanfordCoreNLP('http://localhost:9000')
+
+list_to_csv = []
+
+
+def get_nlp_info(tweet):
+    # entities, parts of speech
+
+    result = nlp.annotate(tweet['text'],
+                          properties={
+                              'annotators': 'sentiment, ner, pos',
+                              'outputFormat': 'json',
+                              'timeout': 1000,
+                              'ner.useSUTime': "false",
+                              'ner.applyFineGrained': "false",
+                              'tokenize.class': 'PTBTokenizer',
+                              'tokenize.language': 'en',
+                              'tokenize.options': 'splitHyphenated = true, invertible, ptb3Escaping = true',
+                              'parse.binaryTrees': "true"
+                          })
+
+    sentiments = []
+    pos = []
+    s_exp = []
+    index = 0
+    tokens = []
+    sentiments = []
+    s_index = 0
+
+    for s in result['sentences']:
+        sentiments.append(int(s['sentimentValue']))
+        temp_list = []
+        for n in s['tokens']:
+            temp_list.append(n)
+        tokens.append(temp_list)
+
+    entities = []
+    entity_sentiments = []
+
+    for s in result['sentences']:
+        sentiment = s['sentimentValue']
+        for e in s['entitymentions']:
+            if e['ner'] == 'LOCATION' or e['ner'] == 'MISC' or e['ner'] == 'MISC' or e['ner'] == 'PERSON':
+            #if e['ner'] != 'EMAIL' and e['ner'] != 'DATE' and e['ner'] != 'SET' and e['ner'] != 'HANDLE' and e['ner'] != 'DURATION' and e['ner'] != 'NUMBER' and e['ner'] != 'PERCENT' and e['ner'] != 'TIME' and e['ner'] != 'MONEY' and e['ner'] != 'URL':
+                entities.append(e['text'].lower())
+                entity_sentiments.append(sentiment)
+
+    return entities, s_exp, entity_sentiments #doesn't include pos
+
+
+def get_text(tweet):
+    if 'text' in tweet:
+        raw_text = tweet['text']
+        words = raw_text.split()
+        punctuation = "!#$%&()*+,./:;<=>?@[\]^_`{|}~"
+        table = str.maketrans('', '', punctuation)
+        tokenized_text = [w.translate(table) for w in words]
+
+        text = raw_text.encode(encoding="UTF-8", errors="ignore")
+    return raw_text, tokenized_text
+
+
+def append_info(tweet):
+    # Entity, Text, Tokenized Text, User ID, Following, Creation Date, Political Party, Parts Of Speech, Sentiment Tree S-expression
+    addition_list = []
+    entities, s_exp, entity_sentiments = get_nlp_info(tweet)
+    text, tokenized_text = get_text(tweet)
+
+    addition_list.append(text)
+    #addition_list.append(tokenized_text)
+    addition_list.append(tweet["user"]["id"])
+    #addition_list.append(tweet["user"]["friends_count"])
+    #addition_list.append(tweet["created_at"])
+    # addition_list.append(get_party(tweet))
+    #addition_list.append(pos)
+    addition_list.append(s_exp)
+
+    final_list = []
+
+    length = len(addition_list)
+
+    for i in range(len(entities)):
+        temp_list = addition_list[-length:]
+        temp_list.insert(0, entities[i])
+        temp_list.insert(1, entity_sentiments[i])
+        final_list.append(temp_list)
+
+    for i in range(len(entities)):
+        list_to_csv.append(final_list[i])
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input', dest='input', type=str, help='The path with the files with our Tweets')
+    #parser.add_argument('-o', '--output', dest='output', type=str, help="The CSV we're outputting annotated tweets to")
+    return parser.parse_args()
+
+
+def read_jsonl(path):
+    tweets = []
+    with open(path, 'r') as jsonl_file:
+        lines = jsonl_file.readlines()  # list of strings
+        for line in lines:
+            if line.strip() != '':
+                tweet = json.loads(line)
+                if ('delete' not in tweet) and ('status_withheld' not in tweet):
+                    tweets.append(tweet)
+    return tweets
+
+
+def write_tsv(path, contents): 
+    with io.open(path, 'w', encoding='utf-8') as csv_file:
+        writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for line in contents:
+            writer.writerow(line)
+
+
+def main():  
+    inp = parse_args().input
+    files = os.listdir(inp)
+    for f in files:
+      list_to_csv.clear()
+      tweets = read_jsonl(inp + "\\" + f)
+      for tweet in tweets:
+          append_info(tweet)
+      write_tsv(f + ".csv", list_to_csv)
+
+
+if __name__ == '__main__':  
+    # We don't want to run code if we're importing this as a library. So, this block
+    # will only run if this is the main file that we're running from
+    main()
