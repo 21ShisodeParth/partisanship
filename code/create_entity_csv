@@ -47,8 +47,7 @@ def get_nlp_info(tweet):
     for s in result['sentences']:
         sentiment = s['sentimentValue']
         for e in s['entitymentions']:
-            if e['ner'] == 'LOCATION' or e['ner'] == 'MISC' or e['ner'] == 'MISC' or e['ner'] == 'PERSON':
-            #if e['ner'] != 'EMAIL' and e['ner'] != 'DATE' and e['ner'] != 'SET' and e['ner'] != 'HANDLE' and e['ner'] != 'DURATION' and e['ner'] != 'NUMBER' and e['ner'] != 'PERCENT' and e['ner'] != 'TIME' and e['ner'] != 'MONEY' and e['ner'] != 'URL':
+            if e['ner'] == 'LOCATION' or e['ner'] == 'MISC' or e['ner'] == 'PERSON':
                 entities.append(e['text'].lower())
                 entity_sentiments.append(sentiment)
 
