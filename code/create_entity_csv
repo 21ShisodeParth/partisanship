@@ -73,12 +73,7 @@ def append_info(tweet):
     text, tokenized_text = get_text(tweet)
 
     addition_list.append(text)
-    #addition_list.append(tokenized_text)
     addition_list.append(tweet["user"]["id"])
-    #addition_list.append(tweet["user"]["friends_count"])
-    #addition_list.append(tweet["created_at"])
-    # addition_list.append(get_party(tweet))
-    #addition_list.append(pos)
     addition_list.append(s_exp)
 
     final_list = []
@@ -98,7 +93,6 @@ def append_info(tweet):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input', dest='input', type=str, help='The path with the files with our Tweets')
-    #parser.add_argument('-o', '--output', dest='output', type=str, help="The CSV we're outputting annotated tweets to")
     return parser.parse_args()
 
 
